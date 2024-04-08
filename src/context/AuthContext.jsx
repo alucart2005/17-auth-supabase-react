@@ -1,8 +1,10 @@
-import { createContext, useContext, useState } from "react";
-import {supabase} from "../supabase/supabase.config"
-
+import { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "../supabase/supabase.config";
+import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
+
 export const AuthContextProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState([]);
   async function signInWithGoogle() {
     try {
@@ -12,20 +14,38 @@ export const AuthContextProvider = ({ children }) => {
       if (error) throw new Error("An error has occurred during authentication");
       return data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
-  async function signout(){
-    const {error} = await supabase.auth.signOut()
+  async function signout() {
+    const { error } = await supabase.auth.signOut();
     if (error) throw new Error("An error occurred during logout");
   }
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("supabase session:", session);
+        console.log("supabase event", event);
+        if (session == null) {
+          navigate("/login", { replace: true });
+        } else {
+          setUser(session?.user);
+          console.log("session?.user  ", session?.user);
+          navigate("/", { replace: true });
+        }
+      }
+    );
+    return ()=>{
+      authListener.subscription
+    }
+  }, []);
   return (
-    <AuthContext.Provider value={{signInWithGoogle,signout,user}}>
+    <AuthContext.Provider value={{ signInWithGoogle, signout, user }}>
       {children}
     </AuthContext.Provider>
-  )
+  );
 };
 
-export const UserAuth=()=>{
-  return useContext (AuthContext)
-}
+export const UserAuth = () => {
+  return useContext(AuthContext);
+};

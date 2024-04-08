@@ -3,8 +3,10 @@ import reactLogo from "../assets/react.svg";
 import viteLogo from "/vite.svg";
 import supabaselogo from "../assets/supabaselogo.png";
 import googlelogo from "../assets/logogoogle.png";
+import { UserAuth } from "../context/AuthCOntext";
 
 export function Login() {
+  const {signInWithGoogle} = UserAuth();
   return (
     <div className="App">
       <div>
@@ -15,7 +17,7 @@ export function Login() {
       <h1>Vite + React + Supabase</h1>
       <img src={googlelogo} className="logo google" alt="React logo" />
       <div className="card">
-        <button>Start with Google</button>
+        <button onClick={signInWithGoogle}>Start with Google</button>
         <p>codewizardai.com</p>
       </div>
       <p className="read-the-docs">
