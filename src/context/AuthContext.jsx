@@ -24,13 +24,12 @@ export const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("supabase session:", session);
         console.log("supabase event", event);
         if (session == null) {
           navigate("/login", { replace: true });
         } else {
-          setUser(session?.user);
-          console.log("session?.user  ", session?.user);
+          setUser(session?.user.user_metadata);
+          console.log("User data  ", session?.user.user_metadata);
           navigate("/", { replace: true });
         }
       }
